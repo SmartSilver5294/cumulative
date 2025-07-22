@@ -19,8 +19,7 @@ x <- ces |>
 filter(year == 2020) |> 
 select(approval, education, ideology) |> 
 drop_na() |> 
-slice_sample(n = 2000)
-x
+slice_sample(n = 2000)alight adjust to lines 
 ```
 
 ```{r}
