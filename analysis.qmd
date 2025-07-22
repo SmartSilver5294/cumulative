@@ -54,13 +54,11 @@ x <- ces |>
 
 fit_approval <- polr(approval ~ ideology + education,
                       data = x)
-fit_approval |> 
-    tidy(conf.int = TRUE)
+
 ```
 
 ```{r}
 #| cache: true
-tidy(fit_approval, conf.int = TRUE)
 # Load gt for pretty tables
 library(gt)
 
@@ -82,7 +80,6 @@ fit_approval |>
     estimate = "Estimate",
     std.error = "Std. Error",
     statistic = "z value",
-    p.value = "p-value",
     conf.low = "95% CI Lower",
     conf.high = "95% CI Upper"
   ) |>
@@ -100,20 +97,22 @@ fit_approval |>
 library(easystats)
 library(see)
 library(ggplot2)
+library(marginaleffects)
 
-# Generate predictions
+# Generate prediction data (not a plot!)
 preds <- plot_predictions(
   fit_approval,
   condition = c("ideology", "education"),
   draw = FALSE
 )
 
-# Plot nicely
-preds +
-  geom_line(aes(group = education, color = education), size = 1.2) +
-  geom_point(aes(color = education), size = 3) +
-  facet_wrap(~response, scales = "free_y") +
+# Plot the predictions yourself using ggplot2
+ggplot(preds, aes(x = ideology, y = estimate, group = education, color = education)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 3) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = education), alpha = 0.2, color = NA) +
   scale_color_brewer(palette = "Dark2") +
+  scale_fill_brewer(palette = "Dark2") +
   theme_minimal(base_family = "Lato") +
   labs(
     title = "Predicted Probabilities of Presidential Approval",
@@ -121,6 +120,7 @@ preds +
     x = "Political Ideology",
     y = "Predicted Probability",
     color = "Education Level",
+    fill = "Education Level",
     caption = "Data: CES 2020 | Model: Ordinal Logistic Regression"
   ) +
   theme(
@@ -130,7 +130,8 @@ preds +
     legend.position = "bottom",
     strip.text = element_text(face = "bold"),
     panel.grid.minor = element_blank()
-  )
+
+)
 
 ```
 
